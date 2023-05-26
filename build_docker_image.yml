@@ -1,0 +1,35 @@
+---
+- hosts: build_host
+  become: true
+  become_user: root
+  gather_facts: no
+  tasks:
+    - name : create build directory
+      file:
+        path: /root/demo-dockerfile
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name : copy Dockerfile
+      copy:
+        src: ./Dockerfile
+        dest: /root/demo-dockerfile/Dockerfile
+        owner: root
+        group: root
+        mode: '0644'
+    - name : install docker 
+      ansible.builtin.shell: cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh
+    - name : install docker-python
+      ansible.builtin.apt:
+        update_cache: true
+        package:
+          - python3-pip
+        state: present
+    - name: build container image
+      community.docker.docker_image:
+        name: democontainer:v1.0
+        build:
+          path: /root/demo-dockerfile
+        source: build
+        state: present
