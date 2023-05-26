@@ -1,2 +1,16 @@
 ---
 # tasks file for cloudengine_creator
+- name: Create Linode Instance
+  hosts: localhost
+  vars_files:
+      - ./group_vars/vars.yml
+  tasks:
+    - name: Create a Linode instance
+      linode.cloud.instance:
+        api_token: "{{ api_token }}"
+        label: my-ansible-linode
+        type: g6-nanode-1
+        region: {{ cloud_region }}
+        image: linode/ubuntu22.04
+        root_pass: "{{ password }}"
+        state: present
